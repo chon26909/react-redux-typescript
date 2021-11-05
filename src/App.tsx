@@ -1,24 +1,33 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import React, { FC, useEffect, Suspense } from 'react';
+import { useDispatch } from "react-redux";
+import { useSelector } from './hooks/useTypeSelector';
+import { getPosts } from "./store/action/action-creators/postActions";
 
-function App() {
+const PostCard = React.lazy(() => import('./components/PostCard'));
+
+const App: FC = () => {
+
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getPosts())
+  }, [])
+
+  const { data, loading } = useSelector(state => state.posts);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="container">
+      <h1 className="center">React Redux Typescript</h1>
+      <Suspense fallback={<div>render components</div>}>
+        <div className="group-post">
+          {
+            loading ? <div>loading...</div> : data && data.map((post, index) => {
+              return <PostCard {...post} key={index} />
+            })
+          }
+        </div>
+      </Suspense>
     </div>
   );
 }
